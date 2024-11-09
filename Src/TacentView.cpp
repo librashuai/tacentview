@@ -65,6 +65,7 @@
 #include "InputBindings.h"
 #include "Command.h"
 #include "RobotoFontBase85.cpp"
+#include "SplitAlpha.h"
 #include "Version.cmake.h"
 using namespace tStd;
 using namespace tSystem;
@@ -192,6 +193,7 @@ namespace Viewer
 	tFileDialog::FileDialog OpenFileDialog(tFileDialog::DialogMode::OpenFile, Viewer::FileTypes_Load);
 	tFileDialog::FileDialog OpenDirDialog(tFileDialog::DialogMode::OpenDir);
 	tFileDialog::FileDialog SaveAsDialog(tFileDialog::DialogMode::SaveFile, Viewer::FileTypes_Save);
+	tFileDialog::FileDialog SaveSplitAlphaDialog(tFileDialog::DialogMode::OpenDir, tSystem::tFileTypes(), "Split Aplha");
 
 	OutputLog OutLog;
 
@@ -261,6 +263,7 @@ namespace Viewer
 	bool Request_ContactSheetModal					= false;
 	bool Request_MultiFrameModal					= false;
 	bool Request_ExtractFramesModal					= false;
+	bool Request_SplitAlpha							= false;
 	bool Request_DeleteFileModal					= false;
 	bool Request_DeleteFileNoRecycleModal			= false;
 	bool Request_RenameModal						= false;
@@ -2032,6 +2035,7 @@ int Viewer::DoMainMenuBar()
 	bool saveContactSheetPressed	= Request_ContactSheetModal;		Request_ContactSheetModal			= false;
 	bool saveMultiFramePressed		= Request_MultiFrameModal;			Request_MultiFrameModal				= false;
 	bool saveExtractFramesPressed	= Request_ExtractFramesModal;		Request_ExtractFramesModal			= false;
+	bool saveSplitAlphaPressed		= Request_SplitAlpha;				Request_SplitAlpha					= false;
 	bool snapMessageNoFileBrowse	= Request_SnapMessage_NoFileBrowse;	Request_SnapMessage_NoFileBrowse	= false;
 	bool snapMessageNoFrameTrans	= Request_SnapMessage_NoFrameTrans;	Request_SnapMessage_NoFrameTrans	= false;
 	bool deleteFilePressed			= Request_DeleteFileModal;			Request_DeleteFileModal				= false;
@@ -2112,6 +2116,10 @@ int Viewer::DoMainMenuBar()
 			bool saveFramesEnabled = CurrImage && (CurrImage->GetNumFrames() > 1);
 			if (ImGui::MenuItem("Save Extract Frames...", saveFramesKey.Chz(), false, saveFramesEnabled))
 				saveExtractFramesPressed = true;
+
+			bool saveSplitAlphaEnabled = CurrImage ? true:false;
+			if (ImGui::MenuItem("Save Split Alpha", NULL, false, saveSplitAlphaEnabled))
+				saveSplitAlphaPressed = true;
 
 			ImGui::Separator();
 
@@ -2600,6 +2608,7 @@ int Viewer::DoMainMenuBar()
 	DoSaveContactSheetModal			(saveContactSheetPressed);
 	DoSaveMultiFrameModal			(saveMultiFramePressed);
 	DoSaveExtractFramesModal		(saveExtractFramesPressed);
+	DoSaveSplitAlphaModal			(saveSplitAlphaPressed);
 	DoSnapMessageNoFileBrowseModal	(snapMessageNoFileBrowse);
 	DoSnapMessageNoFrameTransModal	(snapMessageNoFrameTrans);
 
@@ -4265,7 +4274,8 @@ int main(int argc, char** argv)
 				}
 			}
 			if (assetsDir.IsEmpty())
-				assetsDir = "/usr/share/" + subAssetDir;
+				//assetsDir = "/usr/share/" + subAssetDir;
+				assetsDir = "Assets/";
 
 			tString xdgConfigHome; tSystem::tGetXDGConfigHome(xdgConfigHome);
 			tString xdgCacheHome;  tSystem::tGetXDGCacheHome(xdgCacheHome);

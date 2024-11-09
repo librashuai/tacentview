@@ -54,7 +54,7 @@ class FileDialog : public tLink<FileDialog>
 public:
 	// In OpenDir dialog mode the file-types are ignored. If file-types is empty (default) then all types are used.
 	// If FileTypes is not empty, selecting "All Types" in the dialog means all types supplied here.
-	FileDialog(DialogMode, const tSystem::tFileTypes& = tSystem::tFileTypes());
+	FileDialog(DialogMode, const tSystem::tFileTypes& = tSystem::tFileTypes(), tString customLabel = tString());
 	~FileDialog();
 
 	// Call when you want the modal dialog to open. If you want it to open in a specific directory supply the openDir
@@ -128,6 +128,7 @@ private:
 	// This member points to a node in one of the supported trees -- RootTreeNode for Linux and both RootTreeNode
 	// and NetworTreeNode for Windows. Be careful, the SelectedNode must be cleared or reset if the tree is deleted.
 	TreeNode* SelectedNode = nullptr;
+	tString customLabel;
 };
 
 

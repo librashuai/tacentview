@@ -755,7 +755,7 @@ bool TreeNode::IsNetworkLocation() const
 }
 
 
-FileDialog::FileDialog(DialogMode mode, const tSystem::tFileTypes& fileTypes) :
+FileDialog::FileDialog(DialogMode mode, const tSystem::tFileTypes& fileTypes, tString customLabel) :
 	PopupJustOpened(false),
 	Mode(mode),
 	FileTypes(fileTypes),
@@ -763,7 +763,8 @@ FileDialog::FileDialog(DialogMode mode, const tSystem::tFileTypes& fileTypes) :
 	#ifdef PLATFORM_WINDOWS
 	NetworkTreeNode(nullptr),
 	#endif
-	SelectedNode(nullptr)
+	SelectedNode(nullptr),
+	customLabel(customLabel)
 {
 	FileDialogs.Append(this);
 }
@@ -784,18 +785,21 @@ void FileDialog::OpenPopup(const tString& openDir, const tString& saveFileBaseNa
 	// but that seems like it's too early, especially if the dialog is a global object.
 	PopulateTrees();
 	
+
 	switch (Mode)
 	{
 		case DialogMode::OpenFile:
 			if (openDir.IsValid() && tDirExists(openDir))
 				DirToPath(ConfigOpenFilePath, openDir);
-			ImGui::OpenPopup("Open File");
+			if(customLabel.IsEmpty())
+				customLabel = "Open File";
 			break;
 
 		case DialogMode::OpenDir:
 			if (openDir.IsValid() && tDirExists(openDir))
 				DirToPath(ConfigOpenDirPath, openDir);
-			ImGui::OpenPopup("Open Directory");
+			if(customLabel.IsEmpty())
+				customLabel = "Open Directory";
 			break;
 
 		case DialogMode::SaveFile:
@@ -804,10 +808,13 @@ void FileDialog::OpenPopup(const tString& openDir, const tString& saveFileBaseNa
 
 			if (saveFileBaseName.IsValid())
 				SaveFileResult = saveFileBaseName.Chr();
-			ImGui::OpenPopup("Save File");
+			if(customLabel.IsEmpty())
+				customLabel = "Save File";
 			break;
 	}
 
+	ImGui::OpenPopup(customLabel.Chr());
+	
 	PopupJustOpened	= true;
 }
 
@@ -1246,13 +1253,13 @@ FileDialog::DialogState FileDialog::DoPopup()
 {
 	// The unused isOpen bool is just so we get a close button in ImGui. 
 	bool isOpen = true;
-	const char* label = nullptr;
+
 	tList<tStringItem>* configPath = nullptr;
 	switch (Mode)
 	{
-		case DialogMode::OpenFile:		label = "Open File";		configPath = &ConfigOpenFilePath;	break;
-		case DialogMode::OpenDir:		label = "Open Directory";	configPath = &ConfigOpenDirPath;	break;
-		case DialogMode::SaveFile:		label = "Save File";		configPath = &ConfigSaveFilePath;	break;
+		case DialogMode::OpenFile:		configPath = &ConfigOpenFilePath;	break;
+		case DialogMode::OpenDir:		configPath = &ConfigOpenDirPath;	break;
+		case DialogMode::SaveFile:		configPath = &ConfigSaveFilePath;	break;
 	}
 
 	const ImGuiStyle& style = ImGui::GetStyle();
@@ -1275,7 +1282,7 @@ FileDialog::DialogState FileDialog::DoPopup()
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-	if (!ImGui::BeginPopupModal(label, &isOpen, ImGuiWindowFlags_MenuBar))
+	if (!ImGui::BeginPopupModal(customLabel.Chr(), &isOpen, ImGuiWindowFlags_MenuBar))
 	{
 		ImGui::PopStyleVar();
 		return DialogState::Closed;

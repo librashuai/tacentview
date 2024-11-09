@@ -74,6 +74,7 @@ namespace Viewer
 	extern tFileDialog::FileDialog OpenFileDialog;
 	extern tFileDialog::FileDialog OpenDirDialog;
 	extern tFileDialog::FileDialog SaveAsDialog;
+	extern tFileDialog::FileDialog SaveSplitAlphaDialog;
 
 	extern Image* CurrImage;
 	extern tString ImageToLoad;

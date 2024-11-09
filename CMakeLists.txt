@@ -117,6 +117,8 @@ add_executable(
 	Src/Resize.h
 	Src/Rotate.cpp
 	Src/Rotate.h
+	Src/SplitAlpha.h
+	Src/SplitAlpha.cpp
 	Src/TacentView.cpp
 	Src/TacentView.h
 	Src/ThumbnailView.cpp
